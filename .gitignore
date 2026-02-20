@@ -1,0 +1,23 @@
+# environments / caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# secrets
+.env
+*.key
+*.pem
+
+# generated outputs (big/noisy)
+*.csv
+*.png
+
+# scratch
+_tmp_run.py
