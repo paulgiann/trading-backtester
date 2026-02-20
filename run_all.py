@@ -230,7 +230,7 @@ class OrderBook:
             price = o.get("price")
             qty = o.get("qty")
             ts = o.get("ts")
-            o = Order(str(order_id), pd.Timestamp(ts) if ts is not None else pd.Timestamp.utcnow(), str(side), int(qty), float(price))
+            o = Order(str(order_id), pd.Timestamp(ts) if ts is not None else pd.Timestamp.now("UTC"), str(side), int(qty), float(price))
         elif not isinstance(o.ts, pd.Timestamp):
             o = Order(o.order_id, pd.Timestamp(o.ts), o.side, o.qty, o.price)
 
