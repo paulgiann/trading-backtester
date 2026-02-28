@@ -483,12 +483,10 @@ class Backtester:
 
         filled_qty = 0
         filled_notional = 0.0
-
         for f in fills:
-            self.om.apply_fill(f.side, f.qty, f.price)
-            tag_used = tag if f.order_id == o.order_id else "BOOK_MATCH"
-            self.trades.append(Trade(ts, f.side, f.qty, f.price, tag_used))
             if f.order_id == o.order_id:
+                self.om.apply_fill(f.side, f.qty, f.price)
+                self.trades.append(Trade(ts, f.side, f.qty, f.price, tag))
                 filled_qty += f.qty
                 filled_notional += f.qty * f.price
 
@@ -623,13 +621,13 @@ def plot_report(equity_curve: List[Tuple[pd.Timestamp, float]], trades: List[Tra
         plt.savefig(f"trade_sizes_{safe}.png", dpi=200)
         plt.show()
 def main():
-    if not (SKIP_DOWNLOAD and os.path.exists("market_data.csv")):
-        download_binance_intraday(SYMBOL, INTERVAL, DAYS, out_csv="market_data.csv")
+    if not (SKIP_DOWNLOAD and os.path.exists("data/raw/market_data.csv")):
+        download_binance_intraday(SYMBOL, INTERVAL, DAYS, out_csv="data/raw/market_data.csv")
     else:
-        print("Using existing market_data.csv (SKIP_DOWNLOAD=1)")
-    df = clean_and_engineer_features("market_data.csv")
+        print("Using existing data/raw/market_data.csv (SKIP_DOWNLOAD=1)")
+    df = clean_and_engineer_features("data/raw/market_data.csv")
 
-    gw = Gateway(df, audit_path="orders_audit.csv")
+    gw = Gateway(df, audit_path="data/processed/orders_audit_run_all.csv")
     st = Strategy(SHORT_W, LONG_W, TARGET_FRAC)
     om = OrderManager()
     book = OrderBook()
