@@ -625,7 +625,17 @@ def main():
         download_binance_intraday(SYMBOL, INTERVAL, DAYS, out_csv="data/raw/market_data.csv")
     else:
         print("Using existing data/raw/market_data.csv (SKIP_DOWNLOAD=1)")
-    df = clean_and_engineer_features("data/raw/market_data.csv")
+    if not os.path.exists("data/processed/features.parquet"):
+        raise FileNotFoundError("Expected data/processed/features.parquet. Run prepare_data.py first.")
+    df = pd.read_parquet("data/processed/features.parquet")
+    df["Datetime"] = pd.to_datetime(df["Datetime"], utc=True, errors="coerce")
+    df = df.dropna(subset=["Datetime"]).set_index("Datetime").sort_index()
+    if "vol_20" not in df.columns:
+        if "vol_30" in df.columns:
+            df["vol_20"] = df["vol_30"]
+        else:
+            raise KeyError("Expected vol_20 or vol_30 in processed features.")
+
 
     gw = Gateway(df, audit_path="data/processed/orders_audit_run_all.csv")
     st = Strategy(SHORT_W, LONG_W, TARGET_FRAC)
