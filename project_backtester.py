@@ -333,6 +333,7 @@ class Backtester:
             self.om.apply_execution(side=side, fill_qty=qty, fill_price=last_px)
             self.trades.append(Trade(ts=last_ts, side=side, qty=qty, price=last_px))
             self.gateway.log_order_event("UPDATE", order_id, side, qty, None, "FILLED", filled_qty=qty, avg_fill_price=last_px, note="forced_final_liquidation")
+            self.equity_curve.append((last_ts, self.om.equity(last_px)))
 
     def results(self) -> Dict[str, float]:
         if not self.equity_curve:
