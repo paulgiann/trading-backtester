@@ -1,6 +1,7 @@
 import time
 import requests
 import pandas as pd
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 BASE = "https://api.binance.com/api/v3/klines"
@@ -18,10 +19,10 @@ def fetch(symbol: str, interval: str, start_ms: int, end_ms: int, limit: int = 1
     return r.json()
 
 def main():
-    symbol = "SOLUSDT"   # change to ETHUSDT / DOGEUSDT if you want
+    symbol = "SOLUSDT"
     interval = "1m"
     days = 7
-    out_csv = "market_data.csv"
+    out_csv = Path("data/raw/market_data.csv")
 
     end = datetime.now(timezone.utc)
     start = end - timedelta(days=days)
@@ -56,6 +57,8 @@ def main():
 
     df["Datetime"] = pd.to_datetime(df["Datetime"], utc=True)
     df = df.drop_duplicates(subset=["Datetime"]).sort_values("Datetime")
+
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_csv, index=False)
 
     print(f"Saved {out_csv} with {len(df)} rows for {symbol} ({interval}), ~{days} days.")

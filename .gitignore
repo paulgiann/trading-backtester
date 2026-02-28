@@ -21,3 +21,7 @@ Thumbs.db
 
 # scratch
 _tmp_run.py
+
+# parquet / backups
+*.parquet
+*.bak

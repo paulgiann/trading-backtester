@@ -323,6 +323,17 @@ class Backtester:
 
             self.gateway.log_order_event("UPDATE", order.order_id, order.side, order.qty, order.limit_price, status, filled_qty, avg_px if filled_qty > 0 else None, note)
 
+        if self._hist and self.om.position != 0:
+            last_ts, last_px = self._hist[-1]
+            side = "SELL" if self.om.position > 0 else "BUY"
+            qty = abs(int(self.om.position))
+            order_id = str(uuid.uuid4())
+
+            self.gateway.log_order_event("SEND", order_id, side, qty, None, "ACCEPTED", note="forced_final_liquidation")
+            self.om.apply_execution(side=side, fill_qty=qty, fill_price=last_px)
+            self.trades.append(Trade(ts=last_ts, side=side, qty=qty, price=last_px))
+            self.gateway.log_order_event("UPDATE", order_id, side, qty, None, "FILLED", filled_qty=qty, avg_fill_price=last_px, note="forced_final_liquidation")
+
     def results(self) -> Dict[str, float]:
         if not self.equity_curve:
             return {}
@@ -373,9 +384,11 @@ def plot_report(equity_curve: List[Tuple[pd.Timestamp, float]], trades: List[Tra
 
 
 def main():
-    df = clean_and_engineer_features("market_data.csv", tz=None, add_features=True)
+    df = pd.read_parquet("data/processed/features.parquet")
+    df["Datetime"] = pd.to_datetime(df["Datetime"], utc=True, errors="coerce")
+    df = df.dropna(subset=["Datetime"]).set_index("Datetime").sort_index()
 
-    gateway = Gateway(df, order_log_path="orders_audit.csv")
+    gateway = Gateway(df, order_log_path="data/processed/orders_audit.csv")
     strategy = MovingAverageCrossoverStrategy(short_window=10, long_window=30, target_risk_fraction=0.20)
     om = OrderManager(initial_cash=100_000.0, max_orders_per_minute=60, max_long_shares=5_000, max_short_shares=5_000)
     engine = MatchingEngine(rng_seed=123, p_fill=0.70, p_partial=0.20, p_cancel=0.10)
