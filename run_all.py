@@ -180,6 +180,12 @@ class MarketTick:
     close: float
     volume: float
     vol_20: float
+    ma_spread: float
+    z_px_60: float
+    breakout_up: int
+    breakout_dn: int
+    volm_ratio: float
+    range_30: float
 
 class Gateway:
     def __init__(self, df: pd.DataFrame, audit_path: str = "orders_audit.csv"):
@@ -199,7 +205,7 @@ class Gateway:
 
     def stream(self) -> Iterator[MarketTick]:
         for ts, r in self.df.iterrows():
-            yield MarketTick(ts, float(r["Open"]), float(r["High"]), float(r["Low"]), float(r["Close"]), float(r["Volume"]), float(r["vol_20"]))
+            yield MarketTick(ts, float(r["Open"]), float(r["High"]), float(r["Low"]), float(r["Close"]), float(r["Volume"]), float(r["vol_20"]), float(r["ma_spread"]), float(r["z_px_60"]), int(r["breakout_up"]), int(r["breakout_dn"]), float(r["volm_ratio"]), float(r["range_30"]))
 
 @dataclass
 class Order:
