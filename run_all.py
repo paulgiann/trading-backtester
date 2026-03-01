@@ -14,6 +14,7 @@ from typing import Dict, Iterator, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import requests
+from strategies import MACrossoverStrategy
 SKIP_DOWNLOAD = os.getenv("SKIP_DOWNLOAD","0") == "1"
 
 
@@ -644,7 +645,7 @@ def main():
 
 
     gw = Gateway(df, audit_path="data/processed/orders_audit_run_all.csv")
-    st = Strategy(SHORT_W, LONG_W, TARGET_FRAC)
+    st = MACrossoverStrategy(SHORT_W, LONG_W, TARGET_FRAC)
     om = OrderManager()
     book = OrderBook()
     eng = MatchingEngine()

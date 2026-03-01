@@ -1,0 +1,1 @@
+from .ma_crossover_strategy import MACrossoverStrategy
