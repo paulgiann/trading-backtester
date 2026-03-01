@@ -6,6 +6,9 @@ import numpy as np
 
 from io_utils import save_dual
 
+FEATURE_SHORT_W = 10
+FEATURE_LONG_W = 50
+
 
 def compute_features(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -39,8 +42,8 @@ def compute_features(df: pd.DataFrame) -> pd.DataFrame:
     out["ret_15"] = out["Close"].pct_change(15)
 
     # Moving averages
-    out["ma_s"] = out["Close"].rolling(12, min_periods=12).mean()
-    out["ma_l"] = out["Close"].rolling(60, min_periods=60).mean()
+    out["ma_s"] = out["Close"].rolling(FEATURE_SHORT_W, min_periods=FEATURE_SHORT_W).mean()
+    out["ma_l"] = out["Close"].rolling(FEATURE_LONG_W, min_periods=FEATURE_LONG_W).mean()
     out["ma_spread"] = (out["ma_s"] - out["ma_l"]) / out["Close"]
 
     # Volatility (realized)
