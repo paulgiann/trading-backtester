@@ -26,8 +26,8 @@ SYMBOL = "SOLUSDT"
 INTERVAL = "1m"
 DAYS = 7
 
-SHORT_W = 10
-LONG_W = 50
+SHORT_W = int(os.getenv("SHORT_W", "10"))
+LONG_W = int(os.getenv("LONG_W", "50"))
 
 TARGET_FRAC = 0.35          # exposure on entry (fraction of equity)
 SPREAD_TH = 0.0005          # 0.05% MA-spread filter (not too strict for 1m)
@@ -38,7 +38,7 @@ STOP_LOSS = 0.012           # 1.2% stop
 TAKE_PROFIT = 0.025         # 1.8% take profit
 MAX_HOLD_HOURS = 6          # time exit
 
-ENGINE_SEED = 123
+ENGINE_SEED = int(os.getenv("ENGINE_SEED", "123"))
 P_FILL = 0.70
 P_PARTIAL = 0.20
 P_CANCEL = 0.10
