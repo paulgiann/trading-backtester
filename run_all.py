@@ -14,7 +14,7 @@ from typing import Dict, Iterator, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import requests
-from strategies import MACrossoverStrategy
+from strategies import MACrossoverStrategy, RegimeAwareStrategy
 SKIP_DOWNLOAD = os.getenv("SKIP_DOWNLOAD","0") == "1"
 
 
@@ -28,6 +28,7 @@ DAYS = 7
 
 SHORT_W = int(os.getenv("SHORT_W", "10"))
 LONG_W = int(os.getenv("LONG_W", "50"))
+STRATEGY_NAME = os.getenv("STRATEGY_NAME", "ma")
 
 TARGET_FRAC = 0.35          # exposure on entry (fraction of equity)
 SPREAD_TH = 0.0005          # 0.05% MA-spread filter (not too strict for 1m)
@@ -509,6 +510,20 @@ class Backtester:
         avg_px = (filled_notional / filled_qty) if filled_qty > 0 else None
         self.gw.log("UPDATE", o.order_id, side, qty, status, filled_qty=filled_qty, avg_px=avg_px, note=note)
 
+    def _force_flatten(self, ts: pd.Timestamp, mark_px: float, tag: str) -> None:
+        if self.om.pos == 0:
+            return
+        side = "SELL" if self.om.pos > 0 else "BUY"
+        qty = abs(int(self.om.pos))
+        o = Order(str(uuid.uuid4()), ts, side, qty, mark_px)
+        self.gw.log("SEND", o.order_id, side, qty, "ACCEPTED", note=tag)
+        self.om.apply_fill(side, qty, float(mark_px))
+        self.trades.append(Trade(ts, side, qty, float(mark_px), tag))
+        self._last_order_ts = ts
+        self._entry_px = None
+        self._entry_ts = None
+        self.gw.log("UPDATE", o.order_id, side, qty, "FILLED", filled_qty=qty, avg_px=float(mark_px), note="forced_final_flatten")
+
     def run(self) -> None:
         for tick in self.gw.stream():
             self._hist_close.append(tick.close)
@@ -533,7 +548,17 @@ class Backtester:
                         self._send_order(tick.ts, side, qty, tick.close, "EXIT_tp_sl_time")
 
             # Signal & crossover event
-            sig = self.st.signal(close)
+            if STRATEGY_NAME == "regime":
+                sig = self.st.signal(
+                    close=close,
+                    z_px_60=tick.z_px_60,
+                    breakout_up=tick.breakout_up,
+                    breakout_dn=tick.breakout_dn,
+                    volm_ratio=tick.volm_ratio,
+                    range_30=tick.range_30,
+                )
+            else:
+                sig = self.st.signal(close)
             crossover = (sig != 0) and (sig != self._prev_sig)
             self._prev_sig = sig
             if not crossover:
@@ -562,9 +587,7 @@ class Backtester:
         last_ts = self._hist_ts[-1] if self._hist_ts else None
         last_px = self._hist_close[-1] if self._hist_close else None
         if last_ts is not None and last_px is not None and self.om.pos != 0:
-            side = "SELL" if self.om.pos > 0 else "BUY"
-            qty = abs(int(self.om.pos))
-            self._send_order(last_ts, side, qty, float(last_px), "FINAL_liquidate")
+            self._force_flatten(last_ts, float(last_px), "FINAL_liquidate")
 
     def results(self) -> Dict[str, float]:
         if not self.equity_curve:
@@ -645,7 +668,10 @@ def main():
 
 
     gw = Gateway(df, audit_path="data/processed/orders_audit_run_all.csv")
-    st = MACrossoverStrategy(SHORT_W, LONG_W, TARGET_FRAC)
+    if STRATEGY_NAME == "regime":
+        st = RegimeAwareStrategy(SHORT_W, LONG_W, TARGET_FRAC)
+    else:
+        st = MACrossoverStrategy(SHORT_W, LONG_W, TARGET_FRAC)
     om = OrderManager()
     book = OrderBook()
     eng = MatchingEngine()
