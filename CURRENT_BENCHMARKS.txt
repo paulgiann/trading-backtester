@@ -7,7 +7,7 @@ MA baseline:
 - all seeds positive
 - all seeds flat at end
 
-Regime strategy:
+Regime strategy (current robust setting):
 - mean_return ≈ 0.06329184
 - median_return ≈ 0.06355183
 - mean_trades ≈ 65.1
@@ -19,6 +19,14 @@ Best current regime one-run:
 - total_return ≈ 0.06692844
 - num_trades = 58
 - max_drawdown ≈ -0.01960914
+
+Rejected nearby setting:
+- SPREAD_TH = 0.0009 gave a stronger one-run result
+- but 10-seed robustness was worse:
+  - mean_return ≈ 0.05328369
+  - mean_trades ≈ 71.7
+  - one negative seed
+- conclusion: SPREAD_TH = 0.0010 remains the better robust choice
 
 Key fixes now in repo:
 - preserve last nonzero signal across neutral bars
