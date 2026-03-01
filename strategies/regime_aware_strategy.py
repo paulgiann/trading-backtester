@@ -11,9 +11,9 @@ class RegimeAwareStrategy:
         long_w: int,
         target_frac: float,
         target_vol: float = 0.02,
-        z_enter: float = 1.25,
-        vol_ratio_min: float = 0.90,
-        range_cap: float = 0.025,
+        z_enter: float = 1.75,
+        vol_ratio_min: float = 1.10,
+        range_cap: float = 0.020,
     ):
         if short_w <= 0 or long_w <= 0 or short_w >= long_w:
             raise ValueError("Require 0 < short_w < long_w.")
