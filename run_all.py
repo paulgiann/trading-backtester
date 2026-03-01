@@ -31,13 +31,14 @@ LONG_W = int(os.getenv("LONG_W", "50"))
 STRATEGY_NAME = os.getenv("STRATEGY_NAME", "ma")
 
 TARGET_FRAC = 0.35          # exposure on entry (fraction of equity)
-SPREAD_TH = 0.0005          # 0.05% MA-spread filter (not too strict for 1m)
+SPREAD_TH = float(os.getenv("SPREAD_TH", "0.0010"))  # stronger MA-spread filter for regime entries
 COOLDOWN_MIN = 3            # min minutes between orders
 TARGET_VOL = 0.02           # vol targeting proxy
+BREAKOUT_Z_MIN = float(os.getenv("BREAKOUT_Z_MIN", "0.5"))
 
 STOP_LOSS = 0.012           # 1.2% stop
 TAKE_PROFIT = 0.025         # 1.8% take profit
-MAX_HOLD_HOURS = 6          # time exit
+MAX_HOLD_HOURS = int(os.getenv("MAX_HOLD_HOURS", "6"))  # time exit
 
 ENGINE_SEED = int(os.getenv("ENGINE_SEED", "123"))
 P_FILL = 0.70
@@ -440,6 +441,12 @@ class MatchingEngine:
         if c and c.get("active"):
             book.cancel(contra.order_id)
 
+        # Cancel any residual remainder of the original order so one backtest
+        # decision does not keep resting in the book across later bars.
+        r = book.get_order(o.order_id)
+        if r and r.get("active"):
+            book.cancel(o.order_id)
+
         return ("FILLED" if fqty == o.qty else "PARTIALLY_FILLED"), fills, note
 
 
@@ -541,11 +548,19 @@ class Backtester:
                 pnl = pos_dir * (tick.close / self._entry_px - 1.0)
                 age = tick.ts - self._entry_ts
 
-                if pnl <= -STOP_LOSS or pnl >= TAKE_PROFIT or age >= pd.Timedelta(hours=MAX_HOLD_HOURS):
+                exit_tag = None
+                if pnl <= -STOP_LOSS:
+                    exit_tag = "EXIT_stop_loss"
+                elif pnl >= TAKE_PROFIT:
+                    exit_tag = "EXIT_take_profit"
+                elif age >= pd.Timedelta(hours=MAX_HOLD_HOURS):
+                    exit_tag = "EXIT_time"
+
+                if exit_tag is not None:
                     if self._last_order_ts is None or (tick.ts - self._last_order_ts) >= self.cooldown:
                         side = "SELL" if self.om.pos > 0 else "BUY"
                         qty = abs(int(self.om.pos))
-                        self._send_order(tick.ts, side, qty, tick.close, "EXIT_tp_sl_time")
+                        self._send_order(tick.ts, side, qty, tick.close, exit_tag)
 
             # Signal & crossover event
             if STRATEGY_NAME == "regime":
@@ -560,7 +575,8 @@ class Backtester:
             else:
                 sig = self.st.signal(close)
             crossover = (sig != 0) and (sig != self._prev_sig)
-            self._prev_sig = sig
+            if sig != 0:
+                self._prev_sig = sig
             if not crossover:
                 continue
 
@@ -669,7 +685,7 @@ def main():
 
     gw = Gateway(df, audit_path="data/processed/orders_audit_run_all.csv")
     if STRATEGY_NAME == "regime":
-        st = RegimeAwareStrategy(SHORT_W, LONG_W, TARGET_FRAC)
+        st = RegimeAwareStrategy(SHORT_W, LONG_W, TARGET_FRAC, breakout_z_min=BREAKOUT_Z_MIN)
     else:
         st = MACrossoverStrategy(SHORT_W, LONG_W, TARGET_FRAC)
     om = OrderManager()

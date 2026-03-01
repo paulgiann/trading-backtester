@@ -12,6 +12,7 @@ class RegimeAwareStrategy:
         target_frac: float,
         target_vol: float = 0.02,
         z_enter: float = 1.75,
+        breakout_z_min: float = 0.5,
         vol_ratio_min: float = 1.10,
         range_cap: float = 0.020,
     ):
@@ -22,6 +23,7 @@ class RegimeAwareStrategy:
         self.target_frac = target_frac
         self.target_vol = target_vol
         self.z_enter = z_enter
+        self.breakout_z_min = breakout_z_min
         self.vol_ratio_min = vol_ratio_min
         self.range_cap = range_cap
 
@@ -48,14 +50,10 @@ class RegimeAwareStrategy:
         trend_dir = 1 if s > l else (-1 if s < l else 0)
 
         if trend_dir == 1 and breakout_up == 1 and volm_ratio >= self.vol_ratio_min:
-            return 1
-        if trend_dir == -1 and breakout_dn == 1 and volm_ratio >= self.vol_ratio_min:
-            return -1
-
-        if np.isfinite(z_px_60):
-            if trend_dir == 0 and z_px_60 <= -self.z_enter:
+            if np.isfinite(z_px_60) and z_px_60 >= self.breakout_z_min:
                 return 1
-            if trend_dir == 0 and z_px_60 >= self.z_enter:
+        if trend_dir == -1 and breakout_dn == 1 and volm_ratio >= self.vol_ratio_min:
+            if np.isfinite(z_px_60) and z_px_60 <= -self.breakout_z_min:
                 return -1
 
         return 0

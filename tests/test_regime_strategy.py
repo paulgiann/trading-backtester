@@ -8,7 +8,7 @@ def test_trend_breakout_long_signal():
     close = pd.Series([100.0, 101.0, 102.0, 103.0])
     sig = st.signal(
         close=close,
-        z_px_60=0.0,
+        z_px_60=0.8,
         breakout_up=1,
         breakout_dn=0,
         volm_ratio=1.2,
@@ -22,7 +22,7 @@ def test_trend_breakout_short_signal():
     close = pd.Series([103.0, 102.0, 101.0, 100.0])
     sig = st.signal(
         close=close,
-        z_px_60=0.0,
+        z_px_60=-0.8,
         breakout_up=0,
         breakout_dn=1,
         volm_ratio=1.2,
