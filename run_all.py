@@ -25,8 +25,8 @@ SYMBOL = "SOLUSDT"
 INTERVAL = "1m"
 DAYS = 7
 
-SHORT_W = 12
-LONG_W = 60
+SHORT_W = 10
+LONG_W = 50
 
 TARGET_FRAC = 0.35          # exposure on entry (fraction of equity)
 SPREAD_TH = 0.0005          # 0.05% MA-spread filter (not too strict for 1m)
