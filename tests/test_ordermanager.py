@@ -22,12 +22,14 @@ def test_order_manager_risk_limits():
     assert ok is False
     assert "max_orders_per_min" in reason
 
+    om = OrderManager()
     om.pos = 4999
     o = Order("o3", ts, "BUY", 10, 1.0)
     ok, reason = om.validate(o, 1.0)
     assert ok is False
     assert "max_long_shares" in reason
 
+    om = OrderManager()
     om.pos = -4999
     o = Order("o4", ts, "SELL", 10, 1.0)
     ok, reason = om.validate(o, 1.0)
