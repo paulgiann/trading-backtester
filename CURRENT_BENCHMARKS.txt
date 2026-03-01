@@ -1,0 +1,27 @@
+Current benchmark snapshot (10/50)
+
+MA baseline:
+- mean_return ≈ 0.00862407
+- median_return ≈ 0.01020685
+- mean_trades ≈ 2.3
+- all seeds positive
+- all seeds flat at end
+
+Regime strategy:
+- mean_return ≈ 0.06329184
+- median_return ≈ 0.06355183
+- mean_trades ≈ 65.1
+- all seeds positive
+- all seeds flat at end
+
+Best current regime one-run:
+- end_equity ≈ 106692.8442
+- total_return ≈ 0.06692844
+- num_trades = 58
+- max_drawdown ≈ -0.01960914
+
+Key fixes now in repo:
+- preserve last nonzero signal across neutral bars
+- cancel residual remainder after partial fills
+- stricter breakout confirmation in RegimeAwareStrategy
+- stronger default SPREAD_TH = 0.0010
