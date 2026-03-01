@@ -1,1 +1,2 @@
 from .ma_crossover_strategy import MACrossoverStrategy
+from .regime_aware_strategy import RegimeAwareStrategy
