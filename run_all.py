@@ -35,12 +35,15 @@ SPREAD_TH = float(os.getenv("SPREAD_TH", "0.0010"))  # stronger MA-spread filter
 COOLDOWN_MIN = 3            # min minutes between orders
 TARGET_VOL = 0.02           # vol targeting proxy
 BREAKOUT_Z_MIN = float(os.getenv("BREAKOUT_Z_MIN", "0.5"))
+VOL_RATIO_MIN = float(os.getenv("VOL_RATIO_MIN", "1.10"))
+RANGE_CAP = float(os.getenv("RANGE_CAP", "0.020"))
 
 STOP_LOSS = 0.012           # 1.2% stop
 TAKE_PROFIT = 0.025         # 1.8% take profit
 MAX_HOLD_HOURS = int(os.getenv("MAX_HOLD_HOURS", "6"))  # time exit
 
 ENGINE_SEED = int(os.getenv("ENGINE_SEED", "123"))
+SHOW_PLOTS = os.getenv("SHOW_PLOTS", "0") == "1"
 P_FILL = 0.70
 P_PARTIAL = 0.20
 P_CANCEL = 0.10
@@ -654,7 +657,8 @@ def plot_report(equity_curve: List[Tuple[pd.Timestamp, float]], trades: List[Tra
     plt.ylabel("Equity")
     plt.tight_layout()
     plt.savefig(f"equity_curve_{safe}.png", dpi=200)
-    plt.show()
+    if SHOW_PLOTS:
+        plt.show()
 
     # Trade size distribution
     if trades:
@@ -665,7 +669,9 @@ def plot_report(equity_curve: List[Tuple[pd.Timestamp, float]], trades: List[Tra
         plt.ylabel("Count")
         plt.tight_layout()
         plt.savefig(f"trade_sizes_{safe}.png", dpi=200)
-        plt.show()
+        if SHOW_PLOTS:
+            plt.show()
+
 def main():
     if not (SKIP_DOWNLOAD and os.path.exists("data/raw/market_data.csv")):
         download_binance_intraday(SYMBOL, INTERVAL, DAYS, out_csv="data/raw/market_data.csv")
@@ -685,7 +691,7 @@ def main():
 
     gw = Gateway(df, audit_path="data/processed/orders_audit_run_all.csv")
     if STRATEGY_NAME == "regime":
-        st = RegimeAwareStrategy(SHORT_W, LONG_W, TARGET_FRAC, breakout_z_min=BREAKOUT_Z_MIN)
+        st = RegimeAwareStrategy(SHORT_W, LONG_W, TARGET_FRAC, breakout_z_min=BREAKOUT_Z_MIN, vol_ratio_min=VOL_RATIO_MIN, range_cap=RANGE_CAP)
     else:
         st = MACrossoverStrategy(SHORT_W, LONG_W, TARGET_FRAC)
     om = OrderManager()
