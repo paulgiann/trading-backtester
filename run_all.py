@@ -656,7 +656,7 @@ def plot_report(equity_curve: List[Tuple[pd.Timestamp, float]], trades: List[Tra
     plt.xlabel("Time")
     plt.ylabel("Equity")
     plt.tight_layout()
-    plt.savefig(f"equity_curve_{safe}.png", dpi=200)
+    plt.savefig(f"equity_curve_{safe}.png", dpi=300)
     if SHOW_PLOTS:
         plt.show()
 
@@ -668,7 +668,7 @@ def plot_report(equity_curve: List[Tuple[pd.Timestamp, float]], trades: List[Tra
         plt.xlabel("Shares")
         plt.ylabel("Count")
         plt.tight_layout()
-        plt.savefig(f"trade_sizes_{safe}.png", dpi=200)
+        plt.savefig(f"trade_sizes_{safe}.png", dpi=300)
         if SHOW_PLOTS:
             plt.show()
 
