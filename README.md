@@ -24,6 +24,10 @@ Run robustness testing with:
 
     python seed_robustness.py
 
+Test the Alpaca paper-trading placeholder with:
+
+    python alpaca_paper.py
+
 ## Data and artifact layout
 
 - data/raw/market_data.csv - downloaded raw Binance intraday data
@@ -88,7 +92,8 @@ Default-seed one-run comparison on current data
 - Residual remainders after partial fills are canceled to avoid unintended later fills.
 - The regime strategy uses stricter breakout confirmation than earlier versions.
 - seed_robustness.py provides reusable environment-driven robustness checks.
-- alpaca_paper.py provides an Alpaca paper-trading configuration and gateway placeholder for the course extension.
+- alpaca_paper.py provides a paper-only Alpaca configuration and gateway placeholder for the course extension.
+- The Alpaca extension is intentionally restricted to the paper endpoint and is not designed for real-money trading.
 - Generated CSV, PNG, Parquet, and backup files are ignored by git via .gitignore.
 - If Parquet support is missing, install pyarrow.
 
