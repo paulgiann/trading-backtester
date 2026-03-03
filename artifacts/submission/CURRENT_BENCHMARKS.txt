@@ -1,47 +1,64 @@
-Current benchmark snapshot (10/50, current local dataset)
+Trading Backtester - Current Benchmark Snapshot
+Current local dataset
+Selected comparison setup: MA baseline vs Regime strategy
 
-MA baseline (SPREAD_TH = 0.0005):
-- mean_return ≈ 0.03585064
-- median_return ≈ 0.03131081
-- mean_trades ≈ 15.5
-- all seeds positive
-- all seeds flat at end
-
-Regime strategy (current robust setting):
-- SPREAD_TH = 0.0010
-- BREAKOUT_Z_MIN = 0.5
-- VOL_RATIO_MIN = 1.10
-- RANGE_CAP = 0.020
-- MAX_HOLD_HOURS = 6
-- mean_return ≈ 0.06329184
-- median_return ≈ 0.06355183
-- mean_trades ≈ 65.1
-- all seeds positive
-- all seeds flat at end
-
-Default-seed one-run comparison on current data:
-- MA:
+MA baseline
+- Configuration:
+  - SHORT_W = 10
+  - LONG_W = 50
+  - SPREAD_TH = 0.0005
+- 10-seed robustness:
+  - mean_return ≈ 0.03585064
+  - median_return ≈ 0.03131081
+  - mean_trades ≈ 15.5
+  - all seeds positive
+  - all seeds flat at end
+- Default-seed one-run:
   - end_equity ≈ 103348.2156
   - total_return ≈ 0.03348216
   - num_trades = 15
   - max_drawdown ≈ -0.01967336
-- Regime:
+
+Regime strategy
+- Configuration:
+  - SHORT_W = 10
+  - LONG_W = 50
+  - SPREAD_TH = 0.0010
+  - BREAKOUT_Z_MIN = 0.5
+  - VOL_RATIO_MIN = 1.10
+  - RANGE_CAP = 0.020
+  - MAX_HOLD_HOURS = 6
+  - TARGET_FRAC = 0.35
+  - COOLDOWN_MIN = 3
+- 10-seed robustness:
+  - mean_return ≈ 0.06329184
+  - median_return ≈ 0.06355183
+  - mean_trades ≈ 65.1
+  - all seeds positive
+  - all seeds flat at end
+- Default-seed one-run:
   - end_equity ≈ 104268.7120
   - total_return ≈ 0.04268712
   - num_trades = 62
   - max_drawdown ≈ -0.03466817
 
-Rejected nearby regime setting:
-- SPREAD_TH = 0.0009 gave a stronger one-run result
-- but 10-seed robustness was worse:
+Selection conclusion
+- The MA strategy is the cleaner lower-turnover baseline.
+- The Regime strategy achieves the stronger return profile on the current local dataset.
+- SPREAD_TH = 0.0010 remains the selected robust regime setting.
+
+Why SPREAD_TH = 0.0010 was selected
+- SPREAD_TH was the only tested tuning lever that materially improved the regime strategy on this dataset.
+- SPREAD_TH = 0.0009 sometimes looked stronger in a single run, but robustness was worse:
   - mean_return ≈ 0.05328369
   - mean_trades ≈ 71.7
   - one negative seed
-- conclusion: SPREAD_TH = 0.0010 remains the better robust choice
+- Nearby settings such as 0.00105 and 0.0011 also produced at least one negative seed.
+- Therefore 0.0010 gave the best robust balance among the tested candidates.
 
-Key fixes now in repo:
-- preserve last nonzero signal across neutral bars
-- cancel residual remainder after partial fills
-- stricter breakout confirmation in RegimeAwareStrategy
-- stronger default SPREAD_TH = 0.0010
-- SHOW_PLOTS toggle for quiet testing and project plots on demand
+Important implementation fixes reflected in these results
+- preserved last nonzero signal across neutral bars
+- canceled residual remainder after partial fills
+- tightened breakout confirmation in RegimeAwareStrategy
+- forced final flatten so runs finish flat cleanly
+- SHOW_PLOTS toggle supports quiet testing and plot generation on demand
