@@ -30,8 +30,10 @@ SHORT_W = int(os.getenv("SHORT_W", "10"))
 LONG_W = int(os.getenv("LONG_W", "50"))
 STRATEGY_NAME = os.getenv("STRATEGY_NAME", "ma")
 
+DEFAULT_SPREAD_TH = "0.0010" if STRATEGY_NAME == "regime" else "0.0005"
+
 TARGET_FRAC = float(os.getenv("TARGET_FRAC", "0.35"))  # exposure on entry (fraction of equity)
-SPREAD_TH = float(os.getenv("SPREAD_TH", "0.0010"))  # stronger MA-spread filter for regime entries
+SPREAD_TH = float(os.getenv("SPREAD_TH", DEFAULT_SPREAD_TH))
 COOLDOWN_MIN = int(os.getenv("COOLDOWN_MIN", "3"))  # min minutes between orders
 TARGET_VOL = 0.02           # vol targeting proxy
 BREAKOUT_Z_MIN = float(os.getenv("BREAKOUT_Z_MIN", "0.5"))
