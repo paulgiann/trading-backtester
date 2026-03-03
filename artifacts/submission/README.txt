@@ -12,7 +12,7 @@ Included files
 What these files show
 - The MA strategy is the simpler, lower-turnover baseline.
 - The Regime strategy is the stronger return-oriented strategy on the current local dataset, with higher turnover.
-- The benchmark text file summarizes both the 10-seed robustness comparison and the default-seed one-run comparison.
+- The benchmark text file summarizes the default-seed one-run comparison, the 10-seed robustness comparison, and the rolling walk-forward comparison.
 
 Current selected regime configuration
 - SHORT_W = 10
@@ -33,6 +33,7 @@ Selection rationale
 Interpretation
 - The MA strategy is preferable when simplicity, lower turnover, and smaller drawdown are prioritized.
 - The Regime strategy is preferable when stronger return on the current dataset is prioritized and higher turnover is acceptable.
+- The walk-forward results also favor the Regime strategy over the MA baseline on the current dataset.
 - Both final compared strategies finish flat at the end of the run.
 
 Notes

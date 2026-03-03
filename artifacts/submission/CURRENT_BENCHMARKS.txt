@@ -18,6 +18,15 @@ MA baseline
   - total_return ≈ 0.03348216
   - num_trades = 15
   - max_drawdown ≈ -0.01967336
+- Walk-forward summary:
+  - 4 rolling out-of-sample folds
+  - mean_return ≈ 0.00363094
+  - median_return ≈ 0.00341631
+  - min_return = 0.0
+  - max_return ≈ 0.00769113
+  - mean_trades = 1.0
+  - 2 zero-trade folds
+  - all folds flat at end
 
 Regime strategy
 - Configuration:
@@ -41,10 +50,20 @@ Regime strategy
   - total_return ≈ 0.04268712
   - num_trades = 62
   - max_drawdown ≈ -0.03466817
+- Walk-forward summary:
+  - 4 rolling out-of-sample folds
+  - mean_return ≈ 0.01835510
+  - median_return ≈ 0.01862125
+  - min_return ≈ -0.00361258
+  - max_return ≈ 0.03979046
+  - mean_trades ≈ 9.75
+  - positive in 3 of 4 folds
+  - all folds flat at end
 
 Selection conclusion
 - The MA strategy is the cleaner lower-turnover baseline.
 - The Regime strategy achieves the stronger return profile on the current local dataset.
+- The Regime strategy also shows stronger rolling out-of-sample behavior than the MA baseline on the current dataset.
 - SPREAD_TH = 0.0010 remains the selected robust regime setting.
 
 Why SPREAD_TH = 0.0010 was selected
@@ -62,3 +81,4 @@ Important implementation fixes reflected in these results
 - tightened breakout confirmation in RegimeAwareStrategy
 - forced final flatten so runs finish flat cleanly
 - SHOW_PLOTS toggle supports quiet testing and plot generation on demand
+- walk_forward.py provides a rolling out-of-sample fold evaluation using processed feature slices
