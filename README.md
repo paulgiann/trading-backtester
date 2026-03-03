@@ -28,6 +28,16 @@ Test the Alpaca paper-trading placeholder with:
 
     python alpaca_paper.py
 
+## Reproducible example runs
+
+Default MA baseline smoke test:
+
+    $env:SKIP_DOWNLOAD="1"; $env:SHOW_PLOTS="0"; python .\run_all.py
+
+Selected Regime configuration used for the current final comparison:
+
+    $env:SKIP_DOWNLOAD="1"; $env:SHOW_PLOTS="0"; $env:STRATEGY_NAME="regime"; $env:SPREAD_TH="0.0010"; $env:BREAKOUT_Z_MIN="0.5"; $env:VOL_RATIO_MIN="1.10"; $env:RANGE_CAP="0.020"; $env:MAX_HOLD_HOURS="6"; $env:TARGET_FRAC="0.35"; $env:COOLDOWN_MIN="3"; python .\run_all.py
+
 ## Data and artifact layout
 
 - data/raw/market_data.csv - downloaded raw Binance intraday data
