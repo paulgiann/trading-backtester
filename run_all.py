@@ -46,6 +46,7 @@ MAX_HOLD_HOURS = int(os.getenv("MAX_HOLD_HOURS", "6"))  # time exit
 
 ENGINE_SEED = int(os.getenv("ENGINE_SEED", "123"))
 SHOW_PLOTS = os.getenv("SHOW_PLOTS", "0") == "1"
+FEATURES_PATH = os.getenv("FEATURES_PATH", "data/processed/features.parquet")
 P_FILL = 0.70
 P_PARTIAL = 0.20
 P_CANCEL = 0.10
@@ -679,9 +680,9 @@ def main():
         download_binance_intraday(SYMBOL, INTERVAL, DAYS, out_csv="data/raw/market_data.csv")
     else:
         print("Using existing data/raw/market_data.csv (SKIP_DOWNLOAD=1)")
-    if not os.path.exists("data/processed/features.parquet"):
-        raise FileNotFoundError("Expected data/processed/features.parquet. Run prepare_data.py first.")
-    df = pd.read_parquet("data/processed/features.parquet")
+    if not os.path.exists(FEATURES_PATH):
+        raise FileNotFoundError(f"Expected processed features at {FEATURES_PATH}. Run prepare_data.py first or set FEATURES_PATH.")
+    df = pd.read_parquet(FEATURES_PATH)
     df["Datetime"] = pd.to_datetime(df["Datetime"], utc=True, errors="coerce")
     df = df.dropna(subset=["Datetime"]).set_index("Datetime").sort_index()
     if "vol_20" not in df.columns:
