@@ -1,0 +1,55 @@
+Trading Backtester - Walk-Forward Summary
+Current local dataset
+Fold structure: 4 rolling out-of-sample folds
+Train window: 2880 bars
+Test window: 1440 bars
+Step size: 1440 bars
+
+MA baseline
+- Configuration:
+  - SHORT_W = 10
+  - LONG_W = 50
+  - SPREAD_TH = 0.0005
+- Fold results:
+  - fold 0: return = 0.00000000, trades = 0, max_drawdown = 0.00000000
+  - fold 1: return ≈ 0.00683263, trades = 2, max_drawdown ≈ -0.00705404
+  - fold 2: return ≈ 0.00769113, trades = 2, max_drawdown ≈ -0.01097458
+  - fold 3: return = 0.00000000, trades = 0, max_drawdown = 0.00000000
+- Summary:
+  - mean_return ≈ 0.00363094
+  - median_return ≈ 0.00341631
+  - min_return = 0.0
+  - max_return ≈ 0.00769113
+  - mean_trades = 1.0
+  - 2 zero-trade folds
+  - all folds flat at end
+
+Regime strategy
+- Configuration:
+  - SHORT_W = 10
+  - LONG_W = 50
+  - SPREAD_TH = 0.0010
+  - BREAKOUT_Z_MIN = 0.5
+  - VOL_RATIO_MIN = 1.10
+  - RANGE_CAP = 0.020
+  - MAX_HOLD_HOURS = 6
+  - TARGET_FRAC = 0.35
+  - COOLDOWN_MIN = 3
+- Fold results:
+  - fold 0: return ≈ 0.01950098, trades = 13, max_drawdown ≈ -0.01656644
+  - fold 1: return ≈ -0.00361258, trades = 12, max_drawdown ≈ -0.01861143
+  - fold 2: return ≈ 0.01774153, trades = 5, max_drawdown ≈ -0.00732951
+  - fold 3: return ≈ 0.03979046, trades = 9, max_drawdown ≈ -0.01146128
+- Summary:
+  - mean_return ≈ 0.01835510
+  - median_return ≈ 0.01862125
+  - min_return ≈ -0.00361258
+  - max_return ≈ 0.03979046
+  - mean_trades ≈ 9.75
+  - positive in 3 of 4 folds
+  - all folds flat at end
+
+Interpretation
+- The Regime strategy remains stronger than the MA baseline in rolling out-of-sample testing on the current dataset.
+- The MA baseline is quieter and more conservative, but it is also materially less active and less profitable in these folds.
+- Both strategies finish flat at the end of every fold, which supports clean position handling in the backtest workflow.

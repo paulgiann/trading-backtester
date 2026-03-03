@@ -4,6 +4,7 @@ This folder contains the final comparison artifacts for the current local datase
 
 Included files
 - CURRENT_BENCHMARKS.txt
+- WALK_FORWARD_SUMMARY.txt
 - equity_curve_ma_current.png
 - trade_sizes_ma_current.png
 - equity_curve_regime_current.png
@@ -12,7 +13,8 @@ Included files
 What these files show
 - The MA strategy is the simpler, lower-turnover baseline.
 - The Regime strategy is the stronger return-oriented strategy on the current local dataset, with higher turnover.
-- The benchmark text file summarizes the default-seed one-run comparison, the 10-seed robustness comparison, and the rolling walk-forward comparison.
+- CURRENT_BENCHMARKS.txt summarizes the default-seed one-run comparison, the 10-seed robustness comparison, and the rolling walk-forward comparison.
+- WALK_FORWARD_SUMMARY.txt gives the fold-by-fold out-of-sample walk-forward results.
 
 Current selected regime configuration
 - SHORT_W = 10
