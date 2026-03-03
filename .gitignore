@@ -19,6 +19,9 @@ Thumbs.db
 *.csv
 *.png
 
+# keep curated submission visuals
+!artifacts/submission/*.png
+
 # scratch
 _tmp_run.py
 
