@@ -57,11 +57,33 @@ class AlpacaPaperGateway:
             f"base_url={self.config.base_url}"
         )
 
+    def account_summary(self) -> str:
+        if not self.is_configured():
+            return "Alpaca paper gateway not configured with API credentials."
+
+        try:
+            from alpaca.trading.client import TradingClient
+        except ImportError:
+            return "alpaca-py is not installed. Install it with: pip install alpaca-py"
+
+        client = TradingClient(
+            self.config.api_key,
+            self.config.api_secret,
+            paper=True,
+        )
+        acct = client.get_account()
+        return (
+            f"status={acct.status} "
+            f"buying_power={acct.buying_power} "
+            f"equity={acct.equity}"
+        )
+
 
 if __name__ == "__main__":
     gw = AlpacaPaperGateway()
     try:
         gw.validate()
         print(gw.summary())
+        print(gw.account_summary())
     except ValueError as exc:
         print(f"Configuration error: {exc}")
