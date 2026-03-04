@@ -113,6 +113,23 @@ def main():
         return
 
     trading_client = TradingClient(api_key, api_secret, paper=True)
+
+    current_qty = 0.0
+    try:
+        pos = trading_client.get_open_position(symbol)
+        current_qty = float(pos.qty)
+    except Exception:
+        current_qty = 0.0
+
+    if decision == "BUY" and current_qty > 0:
+        print(f"decision=HOLD reason=already_long current_qty={current_qty}")
+        return
+    if decision == "SELL" and current_qty < 0:
+        print(f"decision=HOLD reason=already_short current_qty={current_qty}")
+        return
+
+    print(f"current_position_qty={current_qty}")
+
     order = MarketOrderRequest(
         symbol=symbol,
         notional=order_notional,
