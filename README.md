@@ -28,9 +28,21 @@ Run walk-forward evaluation with:
 
     python walk_forward.py
 
-Test the Alpaca paper-trading placeholder with:
+Test the Alpaca paper account connection with:
 
-    python alpaca_paper.py
+    .\.venv\Scripts\python .\alpaca_paper.py
+
+Preview live Alpaca feature computation with:
+
+    .\.venv\Scripts\python .\alpaca_live_features.py
+
+Preview the live Alpaca strategy decision with:
+
+    .\.venv\Scripts\python .\alpaca_live_decision.py
+
+Preview the live Alpaca paper order bridge with:
+
+    .\.venv\Scripts\python .\alpaca_live_order.py
 
 ## Reproducible example runs
 
@@ -45,6 +57,12 @@ Selected Regime configuration used for the current final comparison:
 Selected Regime walk-forward evaluation:
 
     $env:WF_STRATEGY_NAME="regime"; $env:WF_SHORT_W="10"; $env:WF_LONG_W="50"; $env:WF_SPREAD_TH="0.0010"; $env:WF_BREAKOUT_Z_MIN="0.5"; $env:WF_VOL_RATIO_MIN="1.10"; $env:WF_RANGE_CAP="0.020"; $env:WF_MAX_HOLD_HOURS="6"; $env:WF_TARGET_FRAC="0.35"; $env:WF_COOLDOWN_MIN="3"; python .\walk_forward.py
+
+Live Alpaca order preview in safe mode:
+
+    .\load_env.ps1
+    $env:ALPACA_SUBMIT_ORDERS="0"
+    .\.venv\Scripts\python .\alpaca_live_order.py
 
 ## Data and artifact layout
 
@@ -128,7 +146,10 @@ Walk-forward comparison on current data
 - The regime strategy uses stricter breakout confirmation than earlier versions.
 - seed_robustness.py provides reusable environment-driven robustness checks.
 - walk_forward.py provides rolling out-of-sample fold evaluation using processed feature slices.
-- alpaca_paper.py provides a paper-only Alpaca configuration and gateway placeholder for the course extension.
+- alpaca_paper.py provides a paper-only Alpaca account smoke test.
+- alpaca_live_features.py previews live Alpaca crypto bars through the same feature pipeline used in backtesting.
+- alpaca_live_decision.py previews the live strategy decision and blocks on zero-liquidity bars.
+- alpaca_live_order.py is a paper-order preview bridge; it stays in preview mode unless ALPACA_SUBMIT_ORDERS=1 is explicitly set.
 - The Alpaca extension is intentionally restricted to the paper endpoint and is not designed for real-money trading.
 - Generated CSV, PNG, Parquet, and backup files are ignored by git via .gitignore.
 - If Parquet support is missing, install pyarrow.
