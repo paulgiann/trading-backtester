@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 from prepare_data import compute_features
 from strategies import RegimeAwareStrategy, MACrossoverStrategy
+from alpaca_live_utils import decide_live_action
 
 
 def main():
@@ -83,27 +84,18 @@ def main():
 
     spread_ok = st.spread_ok(close, float(latest["Close"]), spread_th)
 
-    if bar_age_seconds > max_bar_age_seconds:
-        print(
-            f"decision=BLOCK reason=stale_bar latest_datetime={latest['Datetime']} "
-            f"bar_age_seconds={bar_age_seconds:.3f} max_bar_age_seconds={max_bar_age_seconds}"
+    print(
+        decide_live_action(
+            signal=int(signal),
+            spread_ok=bool(spread_ok),
+            latest_datetime=latest["Datetime"],
+            latest_close=float(latest["Close"]),
+            raw_volume=float(raw_latest["volume"]),
+            raw_trade_count=float(raw_latest["trade_count"]),
+            bar_age_seconds=float(bar_age_seconds),
+            max_bar_age_seconds=max_bar_age_seconds,
         )
-        return
-
-    if float(raw_latest["volume"]) == 0.0 or float(raw_latest["trade_count"]) == 0.0:
-        print(f"decision=BLOCK reason=zero_liquidity latest_datetime={latest['Datetime']}")
-        return
-
-    if not spread_ok:
-        print(f"decision=HOLD reason=spread_filter latest_datetime={latest['Datetime']}")
-        return
-
-    if signal > 0:
-        print(f"decision=BUY latest_datetime={latest['Datetime']} close={latest['Close']}")
-    elif signal < 0:
-        print(f"decision=SELL latest_datetime={latest['Datetime']} close={latest['Close']}")
-    else:
-        print(f"decision=HOLD reason=no_signal latest_datetime={latest['Datetime']}")
+    )
 
 
 if __name__ == "__main__":
