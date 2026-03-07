@@ -17,6 +17,7 @@ def main():
 
     symbol = os.getenv("ALPACA_SYMBOL", "SOL/USD")
     lookback_minutes = int(os.getenv("ALPACA_LOOKBACK_MINUTES", "500"))
+    max_bar_age_seconds = int(os.getenv("ALPACA_MAX_BAR_AGE_SECONDS", "90"))
 
     strategy_name = os.getenv("STRATEGY_NAME", "regime")
     short_w = int(os.getenv("SHORT_W", "10"))
@@ -43,6 +44,8 @@ def main():
         raise SystemExit("decision=BLOCK reason=no_bars")
 
     raw_latest = raw.iloc[-1].copy()
+    latest_bar_ts = raw_latest["timestamp"]
+    bar_age_seconds = (end - latest_bar_ts).total_seconds()
 
     bars = raw.rename(columns={
         "timestamp": "Datetime",
@@ -79,6 +82,13 @@ def main():
         signal = st.signal(close)
 
     spread_ok = st.spread_ok(close, float(latest["Close"]), spread_th)
+
+    if bar_age_seconds > max_bar_age_seconds:
+        print(
+            f"decision=BLOCK reason=stale_bar latest_datetime={latest['Datetime']} "
+            f"bar_age_seconds={bar_age_seconds:.3f} max_bar_age_seconds={max_bar_age_seconds}"
+        )
+        return
 
     if float(raw_latest["volume"]) == 0.0 or float(raw_latest["trade_count"]) == 0.0:
         print(f"decision=BLOCK reason=zero_liquidity latest_datetime={latest['Datetime']}")
