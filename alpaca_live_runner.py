@@ -17,31 +17,56 @@ def main():
         f"log_path={log_path}"
     )
 
+    last_seen_latest_datetime = None
+
     for i in range(1, iterations + 1):
         now_utc = datetime.now(timezone.utc)
         ctx = build_live_signal_context()
+        latest_dt_str = str(ctx["latest_datetime"])
 
-        row = {
-            "runner_time_utc": now_utc.isoformat(),
-            "iteration": i,
-            "symbol": ctx["symbol"],
-            "strategy_name": ctx["strategy_name"],
-            "latest_datetime": str(ctx["latest_datetime"]),
-            "latest_close": ctx["latest_close"],
-            "signal": ctx["signal"],
-            "spread_ok": ctx["spread_ok"],
-            "raw_volume": ctx["raw_volume"],
-            "raw_trade_count": ctx["raw_trade_count"],
-            "bar_age_seconds": ctx["bar_age_seconds"],
-            "max_bar_age_seconds": ctx["max_bar_age_seconds"],
-            "action_line": ctx["action_line"],
-        }
-
-        out_path = append_live_log_row(row, log_path)
-        print(
-            f"iteration={i} latest_datetime={ctx['latest_datetime']} "
-            f"action_line={ctx['action_line']} log_path={out_path}"
-        )
+        if latest_dt_str == last_seen_latest_datetime:
+            row = {
+                "runner_time_utc": now_utc.isoformat(),
+                "iteration": i,
+                "symbol": ctx["symbol"],
+                "strategy_name": ctx["strategy_name"],
+                "latest_datetime": latest_dt_str,
+                "latest_close": ctx["latest_close"],
+                "signal": ctx["signal"],
+                "spread_ok": ctx["spread_ok"],
+                "raw_volume": ctx["raw_volume"],
+                "raw_trade_count": ctx["raw_trade_count"],
+                "bar_age_seconds": ctx["bar_age_seconds"],
+                "max_bar_age_seconds": ctx["max_bar_age_seconds"],
+                "action_line": "decision=SKIP reason=duplicate_bar",
+            }
+            out_path = append_live_log_row(row, log_path)
+            print(
+                f"iteration={i} latest_datetime={latest_dt_str} "
+                f"action_line=decision=SKIP reason=duplicate_bar log_path={out_path}"
+            )
+        else:
+            row = {
+                "runner_time_utc": now_utc.isoformat(),
+                "iteration": i,
+                "symbol": ctx["symbol"],
+                "strategy_name": ctx["strategy_name"],
+                "latest_datetime": latest_dt_str,
+                "latest_close": ctx["latest_close"],
+                "signal": ctx["signal"],
+                "spread_ok": ctx["spread_ok"],
+                "raw_volume": ctx["raw_volume"],
+                "raw_trade_count": ctx["raw_trade_count"],
+                "bar_age_seconds": ctx["bar_age_seconds"],
+                "max_bar_age_seconds": ctx["max_bar_age_seconds"],
+                "action_line": ctx["action_line"],
+            }
+            out_path = append_live_log_row(row, log_path)
+            print(
+                f"iteration={i} latest_datetime={latest_dt_str} "
+                f"action_line={ctx['action_line']} log_path={out_path}"
+            )
+            last_seen_latest_datetime = latest_dt_str
 
         if i < iterations:
             time.sleep(sleep_seconds)
