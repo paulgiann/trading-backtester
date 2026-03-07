@@ -73,6 +73,7 @@ Finite paper-only live runner example:
     .\load_env.ps1
     $env:ALPACA_RUNNER_ITERATIONS="2"
     $env:ALPACA_RUNNER_SLEEP_SECONDS="1"
+    $env:ALPACA_RUNNER_COOLDOWN_SECONDS="60"
     .\.venv\Scripts\python .\alpaca_live_runner.py
 
 ## Data and artifact layout
@@ -162,6 +163,7 @@ Walk-forward comparison on current data
 - alpaca_live_decision.py previews the live strategy decision and now blocks on both stale bars and zero-liquidity bars.
 - alpaca_live_order.py is a paper-order preview bridge; it stays in preview mode unless ALPACA_SUBMIT_ORDERS=1 is explicitly set.
 - alpaca_live_runner.py provides a finite paper-only polling loop that logs each cycle to CSV under outputs/logs.
+- The finite runner now suppresses duplicate bars and also supports a cooldown window for repeated actionable BUY/SELL signals.
 - alpaca_live_decision.py and alpaca_live_order.py now share the same reusable live decision gate through alpaca_live_utils.py.
 - alpaca_live_utils.py also now provides the shared live signal-context builder and CSV append helper used by the finite runner.
 - The live Alpaca order path now also blocks if there is already an open order for the same symbol.
