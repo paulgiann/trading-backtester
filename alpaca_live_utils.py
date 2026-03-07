@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import os
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import pandas as pd
 
 from prepare_data import compute_features
 from strategies import RegimeAwareStrategy, MACrossoverStrategy
@@ -139,3 +142,13 @@ def build_live_signal_context() -> dict:
         "max_bar_age_seconds": int(max_bar_age_seconds),
         "action_line": action_line,
     }
+
+
+def append_live_log_row(row: dict, log_path: str | Path) -> Path:
+    path = Path(log_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    df = pd.DataFrame([row])
+    header = not path.exists()
+    df.to_csv(path, mode="a", header=header, index=False)
+    return path
