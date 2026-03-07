@@ -148,10 +148,12 @@ Walk-forward comparison on current data
 - walk_forward.py provides rolling out-of-sample fold evaluation using processed feature slices.
 - alpaca_paper.py provides a paper-only Alpaca account smoke test.
 - alpaca_live_features.py previews live Alpaca crypto bars through the same feature pipeline used in backtesting.
-- alpaca_live_decision.py previews the live strategy decision and blocks on zero-liquidity bars.
+- alpaca_live_decision.py previews the live strategy decision and now blocks on both stale bars and zero-liquidity bars.
 - alpaca_live_order.py is a paper-order preview bridge; it stays in preview mode unless ALPACA_SUBMIT_ORDERS=1 is explicitly set.
+- alpaca_live_decision.py and alpaca_live_order.py now share the same reusable live decision gate through alpaca_live_utils.py.
 - The live Alpaca order path now also blocks if there is already an open order for the same symbol.
 - The live Alpaca order path also blocks if an opposite-side position already exists, avoiding silent reversal behavior.
+- tests/test_alpaca_live_utils.py adds focused unit coverage for the shared live decision gate.
 - The Alpaca extension is intentionally restricted to the paper endpoint and is not designed for real-money trading.
 - Generated CSV, PNG, Parquet, and backup files are ignored by git via .gitignore.
 - If Parquet support is missing, install pyarrow.
