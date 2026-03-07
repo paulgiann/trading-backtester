@@ -8,7 +8,7 @@ Current state
 - The repo is on main, cleanly organized, and pushed.
 - The project now compares a simpler MA baseline against a more selective Regime strategy on the current local dataset.
 - Core assignment components are implemented: data download, feature preparation, gateway-style ingestion, order book, order manager, matching engine simulation, strategy execution, reporting, and tests.
-- Alpaca support is included as a paper-only extension point through alpaca_paper.py.
+- Alpaca support now includes a paper-account smoke test, live feature preview, live decision preview, live order preview, and a finite paper-only live runner with CSV logging.
 
 Current selected strategy settings
 - MA baseline:
@@ -62,6 +62,13 @@ Important implementation notes
 - The regime strategy uses stricter breakout confirmation than earlier versions.
 - Forced final flatten ensures runs finish flat cleanly.
 - SHOW_PLOTS supports quiet testing and plot generation on demand.
+- alpaca_paper.py provides a paper-account smoke test.
+- alpaca_live_features.py previews live Alpaca bars through the same feature pipeline used in backtesting.
+- alpaca_live_decision.py previews the live strategy decision and now blocks on stale bars and zero-liquidity bars.
+- alpaca_live_order.py remains preview-first unless ALPACA_SUBMIT_ORDERS=1 is explicitly set.
+- The live Alpaca order path now also blocks existing open orders and opposite-side positions.
+- alpaca_live_utils.py now provides the shared live decision gate, shared live signal-context builder, and CSV append helper.
+- alpaca_live_runner.py now provides a finite paper-only polling loop with CSV logging under outputs/logs.
 - Generated CSV, PNG, Parquet, and backup files are ignored by git.
 
 Reference
