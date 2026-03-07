@@ -13,7 +13,8 @@ def main():
     from alpaca.data.timeframe import TimeFrame
     from alpaca.trading.client import TradingClient
     from alpaca.trading.requests import MarketOrderRequest
-    from alpaca.trading.enums import OrderSide, TimeInForce
+    from alpaca.trading.enums import OrderSide, TimeInForce, QueryOrderStatus
+    from alpaca.common.exceptions import APIError
 
     api_key = os.environ["ALPACA_API_KEY"]
     api_secret = os.environ["ALPACA_API_SECRET"]
@@ -114,10 +115,18 @@ def main():
 
     trading_client = TradingClient(api_key, api_secret, paper=True)
 
+    open_orders = trading_client.get_orders(status=QueryOrderStatus.OPEN)
+    same_symbol_open = [o for o in open_orders if getattr(o, "symbol", None) == symbol]
+    if same_symbol_open:
+        print(f"decision=BLOCK reason=open_order_exists open_order_count={len(same_symbol_open)}")
+        return
+
     current_qty = 0.0
     try:
         pos = trading_client.get_open_position(symbol)
         current_qty = float(pos.qty)
+    except APIError:
+        current_qty = 0.0
     except Exception:
         current_qty = 0.0
 
@@ -126,6 +135,12 @@ def main():
         return
     if decision == "SELL" and current_qty < 0:
         print(f"decision=HOLD reason=already_short current_qty={current_qty}")
+        return
+    if decision == "BUY" and current_qty < 0:
+        print(f"decision=BLOCK reason=opposite_position_exists current_qty={current_qty}")
+        return
+    if decision == "SELL" and current_qty > 0:
+        print(f"decision=BLOCK reason=opposite_position_exists current_qty={current_qty}")
         return
 
     print(f"current_position_qty={current_qty}")
