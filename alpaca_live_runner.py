@@ -23,7 +23,34 @@ def main():
 
     for i in range(1, iterations + 1):
         now_utc = datetime.now(timezone.utc)
-        ctx = build_live_signal_context()
+
+        try:
+            ctx = build_live_signal_context()
+        except Exception as e:
+            row = {
+                "runner_time_utc": now_utc.isoformat(),
+                "iteration": i,
+                "symbol": "",
+                "strategy_name": "",
+                "latest_datetime": "",
+                "latest_close": "",
+                "signal": "",
+                "spread_ok": "",
+                "raw_volume": "",
+                "raw_trade_count": "",
+                "bar_age_seconds": "",
+                "max_bar_age_seconds": "",
+                "action_line": f"decision=SKIP reason=runner_exception error={type(e).__name__}",
+            }
+            out_path = append_live_log_row(row, log_path)
+            print(
+                f"iteration={i} action_line=decision=SKIP reason=runner_exception "
+                f"error={type(e).__name__} log_path={out_path}"
+            )
+            if i < iterations:
+                time.sleep(sleep_seconds)
+            continue
+
         latest_dt_str = str(ctx["latest_datetime"])
         action_line = ctx["action_line"]
 
