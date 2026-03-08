@@ -11,11 +11,15 @@ def main():
     iterations = int(os.getenv("ALPACA_RUNNER_ITERATIONS", "3"))
     sleep_seconds = float(os.getenv("ALPACA_RUNNER_SLEEP_SECONDS", "5"))
     cooldown_seconds = float(os.getenv("ALPACA_RUNNER_COOLDOWN_SECONDS", "0"))
+    max_runtime_minutes = float(os.getenv("ALPACA_RUNNER_MAX_RUNTIME_MINUTES", "0"))
     log_path = os.getenv("ALPACA_RUNNER_LOG_PATH", "outputs/logs/alpaca_live_runner_log.csv")
+
+    start_utc = datetime.now(timezone.utc)
 
     print(
         f"runner_start iterations={iterations} sleep_seconds={sleep_seconds} "
-        f"cooldown_seconds={cooldown_seconds} log_path={log_path}"
+        f"cooldown_seconds={cooldown_seconds} max_runtime_minutes={max_runtime_minutes} "
+        f"log_path={log_path}"
     )
 
     last_seen_latest_datetime = None
@@ -23,6 +27,15 @@ def main():
 
     for i in range(1, iterations + 1):
         now_utc = datetime.now(timezone.utc)
+
+        if max_runtime_minutes > 0:
+            elapsed_minutes = (now_utc - start_utc).total_seconds() / 60.0
+            if elapsed_minutes >= max_runtime_minutes:
+                print(
+                    f"runner_stop reason=max_runtime_reached elapsed_minutes={elapsed_minutes:.3f} "
+                    f"max_runtime_minutes={max_runtime_minutes}"
+                )
+                break
 
         try:
             ctx = build_live_signal_context()

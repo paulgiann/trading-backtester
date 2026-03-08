@@ -172,10 +172,13 @@ Walk-forward comparison on current data
 - The Alpaca extension is intentionally restricted to the paper endpoint and is not designed for real-money trading.
 - Generated CSV, PNG, Parquet, and backup files are ignored by git via .gitignore.
 - If Parquet support is missing, install pyarrow.
-
+- Backtest benchmarks, robustness results, walk-forward evaluation, and curated submission artifacts remain tied to the project's validated SOL-based research workflow.
+- The live Alpaca preview / runner path may use ALPACA_SYMBOL as an operational override without changing the benchmark asset used in the research package.
+- Current paper-trading checks suggest BTC/USD can be more viable than SOL/USD in the Alpaca minute-bar feed, so live symbol choice should be treated as a launch-readiness setting rather than a full-project benchmark change.
 ## Submission-oriented note
 
 The cleanest summary of the final current results is in:
 
 - artifacts/submission/README.txt
 - artifacts/submission/CURRENT_BENCHMARKS.txt
+
